@@ -1,6 +1,0 @@
-[package]
-name = "varibles"
-version = "0.1.0"
-authors = ["Michael <michael.zhai@centrality.ai>"]
-
-[dependencies]
