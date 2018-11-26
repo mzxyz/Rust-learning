@@ -37,9 +37,28 @@ fn reference(s: &String) -> usize {
 
 /// At any given time, you can have either (but not both of) one mutable reference or any number of immutable references.
 /// References must always be valid.
-References must always be valid.
 fn mut_reference(s: &mut String) {
     s.push_str(", world");
+}
+
+/// get first word -> slice
+fn first_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s
+}
+
+fn slice() {
+    let s = String::from("Hello World");
+    let h = &s[0..=4];
+    let w = &s[6..];
+    let t = &s[..];
+    println!("{} {} {}", h, w, t);
 }
 
 fn main() {
@@ -54,13 +73,21 @@ fn main() {
 
     // mut reference
     let mut s3 = String::from("Hello");
-    let _r1 = &mut s3;
+
     // let r2 = &mut s3; this will throw error
     // you can only have one mutable reference to a particular piece of data in a particular scope.
+    mut_reference(&mut s3);
 
     // right code
     {
         let _r2 = &mut s3;
     }
 
+
+    // slice
+    let s4 = String::from("Hello World");
+    let w1 = first_word(&s4);
+    println!("{}", w1);
+
+    slice();
 }
