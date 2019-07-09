@@ -41,6 +41,16 @@ fn mut_reference(s: &mut String) {
     s.push_str(", world");
 }
 
+fn first_word(s: &String) {
+    let bytes = s.as_bytes();
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[..i];
+        }
+    }
+    &s
+}
+
 /// get first word -> slice
 fn first_word(s: &str) -> &str {
     let bytes = s.as_bytes();
