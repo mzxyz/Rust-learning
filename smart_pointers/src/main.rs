@@ -99,7 +99,7 @@ fn use_rc_create_cons() {
     {
         // the implementation of the Drop trait decreases the 
         // reference count automatically when an Rc<T> value goes out of scope.
-        let _c = Cons(4, Rc::clone(&a));å
+        let _c = Cons(4, Rc::clone(&a));
         println!("count after creating c = {}", strong_count(&a));
     }
 
@@ -135,6 +135,21 @@ fn use_rc_create_cons() {
 /// you can mutate the value inside the RefCell<T> even when the RefCell<T> is immutable.
  
 // Mutating the value inside an immutable value is the interior mutability pattern.
+#[allow(dead_code)] 
+fn interior_mutability() {
+    let _x = 5;
+    // !! cannot borrow immutable local variable `x` as mutable
+    // let y = &mut x; 
+
+}
+
+/// A test double is the general programming concept for a type 
+/// used in place of another type during testing. Mock objects 
+/// are specific types of test doubles that record what happens 
+/// during a test so you can assert that the correct actions took place.
+#[allow(dead_code)] 
+fn mock_objects() { 
+}
 
 fn main() {
     // 2. dereference
@@ -152,5 +167,5 @@ fn main() {
     println!("CustomSmartPointer created {:?}", b);
 
     // 4. Rc<T>
-    use_box_create_cons();
+    use_rc_create_cons();
 }
