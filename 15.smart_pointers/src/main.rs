@@ -16,6 +16,7 @@
 // -> recursive type
 
 use std::ops::Deref;
+mod mock;
 
 // https://doc.rust-lang.org/rust-by-example/custom_types/enum/testcase_linked_list.html
 fn deref_use() {
@@ -143,12 +144,64 @@ fn interior_mutability() {
 
 }
 
-/// A test double is the general programming concept for a type 
-/// used in place of another type during testing. Mock objects 
-/// are specific types of test doubles that record what happens 
-/// during a test so you can assert that the correct actions took place.
-#[allow(dead_code)] 
-fn mock_objects() { 
+/// Having multiple owners of mutable data by combining Rc<T> and RefCell<T>
+/// A common way to use RefCell<T> is in combination with Rc<T>. Recall that 
+/// Rc<T> lets you have multiple owners of some data, but it only gives 
+/// immutable access to that data. If you have an Rc<T> that holds a RefCell<T>,
+///  you can get a value that can have multiple owners and that you can mutate!
+#[derive(Debug)]
+enum MutList {
+    MutCons(Rc<RefCell<i32>>, Rc<MutList>),
+    Nil
+}
+
+use crate::MutList::{MutCons, Nil as Null};
+use std::cell::RefCell;
+
+fn multi_owners_mutable_data() {
+    let value = Rc::new(RefCell::new(5));
+    let a = Rc::new(MutCons(Rc::clone(&value), Rc::new(Null)));
+
+    let b = MutCons(Rc::new(RefCell::new(6)), Rc::clone(&a));
+    let c = MutCons(Rc::new(RefCell::new(7)), Rc::clone(&a));
+
+    // The `borrow_mut` method returns a RefMut<T> smart pointer, 
+    // and we use the dereference operator on it and change the inner value.
+    *value.borrow_mut() += 10;
+
+    println!("a after = {:?}", a);
+    println!("b after = {:?}", b);
+    println!("c after = {:?}", c);
+    println!("\n")
+}
+
+/// 6. Reference cycles can leak memory
+mod reference;
+use reference::cycle_reference::CycList::{ Cons as CycleCons, Nil as CycleNil };
+
+fn cycle_reference() {
+    let strong_count = |a| Rc::strong_count(a);
+
+    let a = Rc::new(CycleCons(5, RefCell::new(Rc::new(CycleNil))));
+    println!("a initial rc count = {}", strong_count(&a));
+    println!("a next item: {:?}", a.tail());
+
+    let b = Rc::new(CycleCons(10, RefCell::new(Rc::clone(&a))));
+    println!("a rc count after b creation = {}", strong_count(&a));
+    println!("b initial rc count = {}", strong_count(&b));
+    println!("b next item = {:?}", b.tail());
+
+    if let Some(link) = a.tail() {
+        *link.borrow_mut() = Rc::clone(&b);
+    }
+
+    println!("b rc count after changing a = {}", strong_count(&b));
+    println!("a rc count after changing a = {}", strong_count(&a));
+    println!("\n");
+
+    // trigger panic due to cycle reference
+    // !!thread 'main' has overflowed its stack
+    // println!("a next item = {:?}", a.tail());
 }
 
 fn main() {
@@ -167,5 +220,14 @@ fn main() {
     println!("CustomSmartPointer created {:?}", b);
 
     // 4. Rc<T>
+    println!("## Rc<T> multiple reference");
     use_rc_create_cons();
+
+    // 5. RefCell<T> and Rc<T>
+    println!("## multi owners mutable data");
+    multi_owners_mutable_data();
+
+    // 6. Cycle reference
+    println!("## cycle reference");
+    cycle_reference();
 }
