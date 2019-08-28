@@ -186,7 +186,93 @@ fn match_cases() {
     println!("feet: {}, inches: {}, Point: ({}, {})", feet, inches, x, y);
 
     // 6. ignoring values in a pattern
-    
+    let mut setting_value = Some(5);
+    let new_setting_value = Some(10);
+    match (setting_value, new_setting_value) {
+        (Some(_), Some(_)) => {
+            println!("Can't overwrite an existing customized value");
+        },
+        _ => {
+            setting_value = new_setting_value;
+        }
+    }
+    println!("setting is {:?}", setting_value);
+
+    // use underscores in multiple places within one pattern to ignore particular values
+    let numbers = (1, 2, 3, 4, 5);
+    match numbers {
+        (first, _, third, _, fifth) => {
+            println!("Some numbers: {}, {}, {}", first, third, fifth);
+        }
+    }
+
+    // ignoring an Unused Variable by Starting Its Name with `_`
+    let _x = 5;
+    let s = Some(String::from("Next"));
+    if let Some(_) = s {
+        println!("found a string");
+    }
+
+    // Ignoring Remaining Parts of a Value with `..`
+    // The .. pattern ignores any parts of a value that we 
+    // haven’t explicitly matched in the rest of the pattern.
+    let point = Point { x: 32, y: 44};
+    match point {
+        Point { x, .. } => println!("x is {}", x)
+        // Point { x, .., z } => println!("x is {}", x)
+    }
+}
+
+// 7. Extra Conditionals with Match Guards
+/// A match guard is an additional if condition 
+/// specified after the pattern in a match arm 
+/// that must also match, along with the pattern 
+/// matching, for that arm to be chosen. Match 
+/// guards are useful for expressing more complex 
+/// ideas than a pattern alone allows.
+fn match_guard() {
+    let x = Some(5);
+    let y = 5;
+
+    match x {
+        Some(50) => println!("got 50"),
+        Some(n) if n == y => println!("matched, n = {:?}", n),
+        _ => println!("Default case")
+    }
+}
+
+// 8. binding
+/// The at operator (@) lets us create a variable that holds a value at 
+/// the same time we’re testing that value to see whether it matches a pattern. 
+enum Msg {
+    Hello { id: i32 }
+}
+
+fn binding_case() {
+    let msg = Msg::Hello { id: 5 };
+    match msg {
+        Msg::Hello { id: id_var @ 3...8 } => {
+            println!("Found an id in range: {}", id_var);
+        },
+        Msg::Hello { id: 10...13 } => {
+            println!("Nothing");
+        },
+        Msg::Hello { id } => {
+            println!("id: {}", id);
+        }
+    }
+}
+
+// We’ve used the underscore (_) as a wildcard pattern 
+// that will match any  value but not bind to the value
+fn foo(_: i32, y: i32) {
+    // gnoring a function parameter can be especially useful 
+    // in some cases, for example, when implementing a trait 
+    // when you need a certain type signature but the function
+    // body in your implementation doesn’t need one of the parameters. 
+    // The compiler will then not warn about unused function parameters, 
+    // as it would if you used a name instead.
+    println!("this code only uses the y parameter: {}", y);
 }
 
 fn main() {
@@ -197,4 +283,7 @@ fn main() {
     let point = (3, 5);
     print_coordinates(&point);
     match_cases();
+    foo(3, 4);
+    match_guard();
+    binding_case();
 }
