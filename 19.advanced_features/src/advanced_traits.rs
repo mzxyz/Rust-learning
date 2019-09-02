@@ -1,4 +1,3 @@
-
 // 1. Specifying Placeholder Types in Trait Definitions with Associated Types
 pub trait Iterator {
   type Item;
@@ -99,26 +98,87 @@ impl<T> HasArea<T> for Square<T> where
 /// associated functions that are part of traits don’t have a self parameter. When 
 /// two types in the same scope implement that trait, Rust can’t figure out which 
 /// type you mean unless you use fully qualified syntax. 
-trait Animal {
-  fn baby_name
-}
 
 // Because Animal::baby_name is an associated function rather than a method, and 
 // thus doesn’t have a self parameter, Rust can’t figure out which implementation 
-// of Animal::baby_name we want. 
+// of Animal::baby_name we want. For normal trait method, we could use:
+// `Animal::baby_name(&dog)` to use `baby_name`
 
-// We’re providing Rust with a type annotation within the angle brackets, which 
-// indicates we want to call the baby_name method from the Animal trait as 
-// implemented on Dog by saying that we want to treat the Dog type as an Animal for this function call
-
+// We’re providing Rust with a `type annotation` within the angle brackets, which 
+// indicates we want to call the baby_name method from the Animal `trait as`
+// implemented on Dog by saying that we want to `treat the Dog type as an Animal` for this function call
 ///!! <Type as Trait>::function(receiver_if_method, next_arg, ...);
+/// You only need to use this more verbose syntax in cases where there are multiple implementations 
+/// that use the same name and Rust needs help to identify which implementation you want to call.
+pub trait Animal {
+  fn baby_name() -> String;
+}
 
-// You only need to use this more verbose syntax in cases where there are multiple implementations 
-// that use the same name and Rust needs help to identify which implementation you want to call.
+pub struct Dog;
+
+impl Dog {
+  fn baby_name() -> String {
+    String::from("Spot")
+  }
+}
+
+impl Animal for Dog {
+  fn baby_name() -> String {
+    String::from("Puppy")
+  }
+}
 
 // 5. Using Supertraits to Require One Trait’s Functionality Within Another Trait
+/// The trait you rely on is a supertrait of the trait you’re implementing.
+/// This technique is similar to adding a trait bound to the trait.
+use std::fmt;
+use fmt::{ Display };
+
+pub trait OutlinePrint: Display {
+  fn outline_print(&self) {
+    let output = self.to_string();
+    let len = output.len();
+
+    println!("{}", "*".repeat(len + 4));
+    println!("*{}*", " ".repeat(len + 2));
+    println!("* {} *", output);
+    println!("*{}*", " ".repeat(len + 2));
+    println!("{}", "*".repeat(len + 4));
+  }
+}
+
+pub struct Pointt {
+  x: i32,
+  y: i32
+}
+
+// `advanced_traits::Pointt` doesn't implement `std::fmt::Display
+impl Display for Pointt {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "({}, {})", self.x, self.y)
+  }
+}
+
+impl OutlinePrint for Pointt {}
 
 // 6. Using the Newtype Pattern to Implement External Traits on External Types
+/// `orphan rule` and `newtype pattern`
+
+/// As an example, let’s say we want to implement Display on Vec<T>, which the 
+/// orphan rule prevents us from doing directly because the Display trait and 
+/// the Vec<T> type are defined outside our crate. We can make a Wrapper struct 
+/// that holds an instance of Vec<T>; then we can implement Display on Wrapper 
+/// and use the Vec<T> value
+
+/// If we wanted the new type to have every method the inner type has, 
+/// implementing the Deref trait on the Wrapper to return the inner type would be a solution.
+struct Wrapper(Vec<String>);
+
+impl fmt::Display for Wrapper {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "[{}]", self.0.join(", "))
+  }
+}
 
 #[cfg(test)]
 mod tests {
@@ -142,5 +202,24 @@ mod tests {
   fn area() {
     let s = Square { x: 0.0, y: 0.0, side: 12.0 };
     assert_eq!(s.area(), 144.0);
+  }
+
+  #[test]
+  fn tait_use_fully_qualified_syntax() {
+    assert_eq!(Dog::baby_name(), String::from("Spot"));
+    assert_eq!(<Dog as Animal>::baby_name(), String::from("Puppy"));
+    // assert!(Animal::baby_name()); // this will cause error `type annotations required`
+  }
+
+  #[test]
+  fn super_trait() {
+    let p = Pointt { x: 1, y: 2 };
+    p.outline_print();
+  }
+
+  #[test]
+  fn new_type() {
+    let w = Wrapper(vec![String::from("hello"), String::from("world")]);
+    assert_eq!(format!("{}", w), "[hello, world]");
   }
 }
