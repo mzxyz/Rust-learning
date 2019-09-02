@@ -220,6 +220,8 @@ mod tests {
   #[test]
   fn new_type() {
     let w = Wrapper(vec![String::from("hello"), String::from("world")]);
-    assert_eq!(format!("{}", w), "[hello, world]");
+    // To convert a single value to a string, use the to_string method. 
+    // This will use the Display formatting trait.
+    assert_eq!(w.to_string(), "[hello, world]");
   }
 }
