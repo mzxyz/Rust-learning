@@ -1,5 +1,6 @@
 /// Ownership is Rust’s most unique feature,
-/// and it enables Rust to make memory safety guarantees without needing a garbage collector. 
+/// and it enables Rust to make memory safety 
+/// guarantees without needing a garbage collector. 
 
 
 /// ownership rules
@@ -29,30 +30,23 @@ fn calculate_len(s: String) -> (String, usize) {
     (s, len)
 }
 
-/// The &s1 syntax lets us create a reference that refers to the value of s1 but does not own it.
-/// Because it does not own it, the value it points to will not be dropped when the reference goes out of scope.
+/// The &s1 syntax lets us create a reference that 
+/// refers to the value of s1 but does not own it.
+/// Because it does not own it, the value it points 
+/// to will not be dropped when the reference goes out of scope.
 fn reference(s: &String) -> usize {
     s.len()
 }
 
-/// At any given time, you can have either (but not both of) one mutable reference or any number of immutable references.
+/// At any given time, you can have either (but not both of) one 
+/// mutable reference or any number of immutable references.
 /// References must always be valid.
 fn mut_reference(s: &mut String) {
     s.push_str(", world");
 }
 
-fn first_word(s: &String) {
-    let bytes = s.as_bytes();
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &s[..i];
-        }
-    }
-    &s
-}
-
 /// get first word -> slice
-fn first_word(s: &str) -> &str {
+pub fn first_word(s: &str) -> &str {
     let bytes = s.as_bytes();
     for (i, &item) in bytes.iter().enumerate() {
         if item == b' ' {
@@ -85,7 +79,8 @@ fn main() {
     let mut s3 = String::from("Hello");
 
     // let r2 = &mut s3; this will throw error
-    // you can only have one mutable reference to a particular piece of data in a particular scope.
+    // you can only have one mutable reference to 
+    // a particular piece of data in a particular scope.
     mut_reference(&mut s3);
 
     // right code
@@ -95,9 +90,17 @@ fn main() {
 
 
     // slice
-    let s4 = String::from("Hello World");
-    let w1 = first_word(&s4);
-    println!("{}", w1);
-
     slice();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_first_word() {
+        let s = String::from("Hello World");
+        let w = first_word(&s);
+        assert_eq!(w, "Hello".to_string());
+    }
 }
