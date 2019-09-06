@@ -1,6 +1,13 @@
-/// By using structs, you can keep associated pieces of data connected to each other and name each piece to make your code clear.
-/// Methods let you specify the behavior that instances of your structs have.
-/// Associated functions let you namespace functionality that is particular to your struct without having an instance available.
+/// 1. By using structs, you can keep associated pieces of 
+/// data connected to each other and name each piece to 
+/// make your code clear.
+
+/// 2. Methods let you specify the behavior that instances 
+/// of your structs have.
+
+/// 3. Associated functions let you namespace functionality 
+/// that is particular to your struct without having an 
+/// instance available.
 
 /// struct
 struct User {
@@ -22,6 +29,9 @@ fn new_user() -> User {
     };
 
     user1.account = 3434;
+    user1.name = String::from("Hex");
+    user1.email = "dd@yahoo.com".to_string();
+    user1.active = false;
     println!("{}", user1.account);
 
     user1
@@ -37,7 +47,6 @@ struct Rectangle {
     width: u32,
     height: u32,
 }
-
 
 /// method
 /// methods are different from functions in that they’re defined within the context of a struct (or an enum or a trait object)
@@ -68,7 +77,6 @@ impl Rectangle {
     }
 }
 
-
 /// borrow other than ownership
 fn area(rectangle: &Rectangle) -> u32 {
     rectangle.width * rectangle.height
@@ -87,6 +95,14 @@ fn main() {
    };
 
    let area_size = area(&rect1);
+   assert_eq!(area_size, rect1.area());
+
+   let rect2 = Rectangle {
+       width: 40,
+       height: 51
+   };
+
+   assert_eq!(rect2.can_hold(&rect1), true);
 
    // call method
    // when you call a method with object.something(), Rust automatically adds in &, &mut, or * so object matches the signature of the method.
