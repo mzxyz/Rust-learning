@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 enum Message {
   Quit,
   Move { x: i32, y: i32 },
@@ -12,10 +13,12 @@ impl Message {
 }
 
 /// options
-enum Option<T> {
-  Some(T), //  <T> means the Some variant of the Option enum can hold one piece of data of any type.
-  None,
-}
+// enum Option<T> {
+//   // <T> means the Some variant of the Option 
+//   // enum can hold one piece of data of any type.
+//   Some(T),
+//   None,
+// }
 
 fn option_ex() {
   let _some_number = Some(5);
@@ -28,11 +31,14 @@ fn option_ex() {
 }
 
 /// the match control flow operator
+#[allow(dead_code)]
+#[derive(Debug)]
 enum UsState {
   Alabama,
   Alaska,
 }
 
+#[allow(dead_code)]
 enum Coin {
   Penny,
   Nickel,
@@ -42,39 +48,42 @@ enum Coin {
 
 fn value_in_cents(coin: Coin) -> u32 {
   match coin {
-    Coin::Penny => 1,
     Coin::Nickel => 3,
     Coin::Dime => 5,
-    Coin::Quarter(state) => {
-      println!("{:?}", state);
+    Coin::Quarter(_state) => {
+      println!("{:?}", _state);
       24
     },
     // The _ pattern will match any value
-    _ => (),
+    _ => 0,
   }
 }
 
 /// match with option<T>
 fn plus_one(x: Option<i32>) -> Option<i32> {
   match x {
-    None => None,
     Some(i) => Some(i + 1),
+    _ => None
   }
 }
 
-/// if let is a syntax sugar for match that runs code when the value matches one pattern and then ignores all other values.
-fn if_let(coin: Coin) {
-  let mut count = 0;
+fn match_same(coin: Coin) {
+  let mut _count = 0;
   match coin {
-    Coin::Quarter(state) => println!("It is quarter"),
-    _ => count += 1,
+    Coin::Quarter(_state) => println!("It is quarter"),
+    _ => _count += 1,
   }
+}
 
+/// if let is a syntax sugar for match that runs code
+/// when the value matches one pattern and then ignores all other values.
+fn if_let(coin: Coin) {
   // same with above code
-  if let Coin::Quarter(state) = coin {
+  let mut _count = 0;
+  if let Coin::Quarter(_state) = coin {
     println!("It is quarter");
   } else {
-    count += 1;
+    _count += 1;
   }
 }
 
