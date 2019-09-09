@@ -116,3 +116,16 @@ fn main() {
    // call associate function
    Rectangle::square(40);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn larger_can_hold_small() {
+        let rect1 = Rectangle { width: 30, height: 50 };
+        let rect2 = Rectangle { width: 40, height: 51 };
+
+        assert!(rect2.can_hold(&rect1));
+    }
+}
